@@ -17,28 +17,6 @@ truffle(development)> Splitter.deployed().then(istance => istance.getBalance(acc
 BN { negative: 0, words: [ 0, <1 empty item> ], length: 1, red: null }
 truffle(development)> Splitter.deployed().then(istance => istance.getBalance(account2))
 BN { negative: 0, words: [ 0, <1 empty item> ], length: 1, red: null }
-truffle(development)> Splitter.deployed().then(istance => istance.addFund({from : account0}))
-{
-  tx: '0xb983e66546e90055a9dedcc8b074e02c4c4901d7ad45a96252cc376e68b9cc4e',
-  receipt: {
-    transactionHash: '0xb983e66546e90055a9dedcc8b074e02c4c4901d7ad45a96252cc376e68b9cc4e',
-    transactionIndex: 0,
-    blockHash: '0x63c63ed0d772eff70b4ee568ef3223fec01354d3abf4ba59a271e69cef3710bc',
-    blockNumber: 4,
-    from: '0xf7b3edd556443a01935a1d433e4a0af9be76b6a8',
-    to: '0x7a85cb0b4df3ea9e1b90ecd98900d4e35cf1997d',
-    gasUsed: 23892,
-    cumulativeGasUsed: 23892,
-    contractAddress: null,
-    logs: [],
-    status: true,
-    logsBloom: '0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000',
-    rawLogs: []
-  },
-  logs: []
-}
-truffle(development)> Splitter.deployed().then(istance => istance.getBalance(account0))
-BN { negative: 0, words: [ 0, <1 empty item> ], length: 1, red: null }
 truffle(development)> Splitter.deployed().then(istance => istance.addFund({from : account0, value : 10000000000000000000}))
 {
   tx: '0x2954b14d12b3bed1effba3767dbe28f048bafc1b0152123787240414b4c7660b',
