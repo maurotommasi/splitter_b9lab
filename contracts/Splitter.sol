@@ -20,7 +20,7 @@ contract Splitter {
     //------------------------------------------------ Mappings
 
     mapping(address => uint) balances;
-    mapping(address => bool) isPayed;
+    //mapping(address => bool) isPayed;
     
     //------------------------------------------------ Modifiers
 
