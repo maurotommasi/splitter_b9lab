@@ -83,8 +83,6 @@ truffle(development)> Splitter.deployed().then(istance => istance.split(account1
 }
 truffle(development)> Splitter.deployed().then(istance => istance.getBalance(account0))
 BN { negative: 0, words: [ 0, <1 empty item> ], length: 1, red: null }
-truffle(development)> Splitter.deployed().then(istance => istance.getBalance(account0))
-BN { negative: 0, words: [ 0, <1 empty item> ], length: 1, red: null }
 truffle(development)> Splitter.deployed().then(istance => istance.getBalance(account1))
 BN {
   negative: 0,
@@ -99,12 +97,6 @@ BN {
   length: 3,
   red: null
 }
-truffle(development)> Splitter.deployed().then(istance => istance.withdrawRefund({from : account1})))
-evalmachine.<anonymous>:0
-Splitter.deployed().then(istance => istance.withdrawRefund({from : account1})))
-                                                                              ^
-
-Uncaught SyntaxError: Unexpected token ')'
 truffle(development)> Splitter.deployed().then(istance => istance.withdrawRefund({from : account1}))
 {
   tx: '0xb4e33b3e5111bac4cd446895a7fdeac514f41838771fe8be37e3766a4d51f07b',
