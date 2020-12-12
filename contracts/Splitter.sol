@@ -66,7 +66,6 @@ contract Splitter {
     }
 
     function addFund() payable public returns(bool){
-        //who want to split some ethers put the msg.value inside her balances
         balances[msg.sender] += msg.value;
     }
 
