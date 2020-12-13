@@ -56,7 +56,7 @@ contract Splitter {
     }
     
     
-    function split(address _first, address _second) public isSplittable returns(bool){
+    function split(address _first, address _second) public onlyOwner isSplittable returns(bool){
         require(_first != msg.sender && _second != msg.sender && _first != _second, "There are two or more identical addresses");
         require(_first != __NULL_ADDRESS__ && _second != __NULL_ADDRESS__, "Beneficiaries could not e null");
         balances[_first] += oddCheckSplit(balances[msg.sender], true);
