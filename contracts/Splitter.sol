@@ -1,26 +1,16 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity >=0.4.25 <=0.7.0; //solc --version to match our solidity compiler version on Vagrant
+pragma solidity >=0.4.25 <=0.7.0;
 
 contract Splitter {
-    
-    //------------------------------------------------ Global variables
 
     address payable owner;
-    
-    //------------------------------------------------ Struct
-
-    //------------------------------------------------ Events
 
     event splitLog(address indexed owner, uint amount, address beneficiary1, address beneficiary2, uint owner_balance, uint b1_balance, uint b2_balance);
     event withdrawRefundLog(address beneficiary, uint amount);
-    
-    //------------------------------------------------ Mappings
 
     mapping(address => uint) balances;
     mapping(address => bool) isPayed;
-    
-    //------------------------------------------------ Modifiers
 
     modifier onlyOwner {
         require(owner == msg.sender);
@@ -31,15 +21,10 @@ contract Splitter {
        require(balances[owner] >= 1000000000000); //0.001 ETH
       _;
     }
-    
-    
-    //------------------------------------------------ Constructor 
 
     constructor() public {
         owner = msg.sender;
     }
-    
-    //------------------------------------------------ Functions
     
     function oddCheckSplit(uint _amount, bool isUp) public pure returns(uint){
         if(_amount % 2 == 0){
