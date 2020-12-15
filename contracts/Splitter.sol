@@ -6,31 +6,29 @@ contract Splitter {
     
     //------------------------------------------------ Global variables
 
-    address payable          __OWNER__;
-    uint                    __MINIMUM_VALUE_SPLITTABLE__ = 1000000000000;
-    address                 __NULL_ADDRESS__ = address(0x0);
+    address payable owner;
     
     //------------------------------------------------ Struct
 
     //------------------------------------------------ Events
 
-    event splitLog(address indexed owner, uint amount, address beneficiary1, address beneficiary2);
+    event splitLog(address indexed owner, uint amount, address beneficiary1, address beneficiary2, uint owner_balance, uint b1_balance, uint b2_balance);
     event withdrawRefundLog(address beneficiary, uint amount);
     
     //------------------------------------------------ Mappings
 
     mapping(address => uint) balances;
-    //mapping(address => bool) isPayed;
+    mapping(address => bool) isPayed;
     
     //------------------------------------------------ Modifiers
 
     modifier onlyOwner {
-        require(__OWNER__ == msg.sender);
+        require(owner == msg.sender);
         _;
     }
     
     modifier isSplittable {
-       require(balances[__OWNER__] >= __MINIMUM_VALUE_SPLITTABLE__);
+       require(balances[owner] >= 1000000000000); //0.001 ETH
       _;
     }
     
@@ -38,7 +36,7 @@ contract Splitter {
     //------------------------------------------------ Constructor 
 
     constructor() public {
-        __OWNER__ = msg.sender;
+        owner = msg.sender;
     }
     
     //------------------------------------------------ Functions
@@ -58,14 +56,15 @@ contract Splitter {
     
     function split(address _first, address _second) public onlyOwner isSplittable returns(bool){
         require(_first != msg.sender && _second != msg.sender && _first != _second, "There are two or more identical addresses");
-        require(_first != __NULL_ADDRESS__ && _second != __NULL_ADDRESS__, "Beneficiaries could not e null");
+        require(_first != address(0x0) && _second != address(0x0), "Beneficiaries could not e null");
         balances[_first] += oddCheckSplit(balances[msg.sender], true);
         balances[_second] += oddCheckSplit(balances[msg.sender], false);
-        emit splitLog(msg.sender, balances[msg.sender], _first, _second);
+        emit splitLog(msg.sender, balances[msg.sender], _first, _second, balances[owner] -  balances[_first] - balances[_second], balances[_first], balances[_second]);
         balances[msg.sender] = 0;
     }
 
     function addFund() payable public returns(bool){
+        //who want to split some ethers put the msg.value inside her balances
         balances[msg.sender] += msg.value;
     }
 
@@ -80,10 +79,6 @@ contract Splitter {
         balances[msg.sender] = 0; 
         msg.sender.transfer(amountToRefund);
         emit withdrawRefundLog(msg.sender, amountToRefund);
-    }
-    
-    function getOwner() public view returns(address){
-        return __OWNER__;
     }
 
 }
