@@ -142,7 +142,7 @@ contract("Splitter", accounts => {
         .then(_owner_balance => {
             owner_balance = _owner_balance.toNumber();
             assert.equal(owner_balance, 0, "Owner Balance must be 0 after having split his value");
-            if(showLog) console.log("Owner Address: " + owner_balance);
+            if(showLog) console.log("Owner Address: " + owner);
             if(showLog) console.log("Owner Balance After Split: " + owner_balance);
             return;
         })
