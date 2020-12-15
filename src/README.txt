@@ -1,1 +1,0 @@
-This part is not finished yet. 2020 12 12 18:19 UTC +1
