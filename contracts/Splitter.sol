@@ -64,7 +64,6 @@ contract Splitter {
     }
 
     function addFund() payable public returns(bool){
-        //who want to split some ethers put the msg.value inside her balances
         balances[msg.sender] += msg.value;
     }
 
@@ -73,7 +72,6 @@ contract Splitter {
     }
 
     function withdrawRefund() public {
-        //who ask to be refunded
         uint amountToRefund = balances[msg.sender];
         require(balances[msg.sender] > 0, "No wei are available in this balance");
         balances[msg.sender] = 0; 
