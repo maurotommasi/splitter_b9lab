@@ -1,6 +1,6 @@
-//import {default as web3} from 'web3';
-//import {default as contract} from 'truffle-contract';
-//import SplitterArtifact from '../../build/contracts/Splitter.json';
+import {default as web3} from 'web3';
+import {default as contract} from 'truffle-contract';
+import SplitterArtifact from '../../build/contracts/Splitter.json';
 //const SplitterArtifact = require('../../build/contract/Splitter.json');
 const Web3 = require("web3");
 const ethEnabled = () => {
@@ -35,7 +35,7 @@ function connect(){
 function alertCoinbase(){
     alert(coinbase);
 }
-/*
+
 const SplitterAddress = "0x3f57d2ac003B90F11428e2135a81a5C13FA2F282"; // <-- truffle(development)> Splitter.deployed().then(istance => istance.address)   
 const SplitterContractFactory = web3.eth.contract(JSON.parse(SplitterArtifact.abi));
 const SplitterInstance = faucetContractFactory.at(faucetAddress);
@@ -171,4 +171,3 @@ function withdrawRefund() {
         }
     });
 }
-*/
