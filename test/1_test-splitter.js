@@ -10,15 +10,39 @@ contract("Splitter", accounts => {
     let showLog = true;
 
     before("Should Set Owner", () => {
-        assert.isAtLeast(accounts.length, 3, 'There should be at least 3 accounts');
+        assert.isAtLeast(accounts.length, 4, 'There should be at least 4 accounts to do this test');
         owner = accounts[0];
         beneficiary1 = accounts[1];
         beneficiary2 = accounts[2];
+        if(showLog) console.log("----------------------------------------");
+        if(showLog) console.log("Owner Address: " + owner);
+        if(showLog) console.log("Beneficiary1 Address: " + beneficiary1);
+        if(showLog) console.log("Beneficiary2 Address: " + beneficiary2);
     });
+
+
+    it("Owner is the first account", function() {
+        
+        let istance;
+
+        return Splitter.deployed()
+        .then(_istance => {
+            istance = _istance;
+            return istance.getOwner.call();
+        })
+        .then(_actualOwner => {
+            actualOwner = _actualOwner;
+            if(showLog) console.log("----------------------------------------");
+            if(showLog) console.log("actualOwner: " + actualOwner);
+            assert.equal(owner, _actualOwner, "Owner Dismatch");
+            return;
+        });
+    });
+
 
     it("Should deploy my contract without additional values", function() {
         return expectedExceptionPromise(function () {
-                return Splitter.new({ from: accounts[0], value: 1, gas: 3000000 })
+                return Splitter.new({ from: owner, value: 1, gas: 3000000 })
             }, 3000000);
     });
 
@@ -41,7 +65,7 @@ contract("Splitter", accounts => {
             return istance.getBalance.call(owner, {from :  owner});
         })
         .then(actualOwnerBalance => {
-            assert.equal(actualOwnerBalance.toNumber(), expectedOwnerBalance, "Owner balance should be ${expectedOwnerBalance} wei");
+            assert.equal(actualOwnerBalance.toNumber(), expectedOwnerBalance, "Owner balance should be $(expectedOwnerBalance) wei");
             return;
         })
     });
@@ -78,10 +102,36 @@ contract("Splitter", accounts => {
         })
     });
 
+    it("Change Owner", function() {
+
+        let istance;
+        let newOwner = accounts[3];
+        if(showLog) console.log("----------------------------------------");
+        if(showLog) console.log("Old Owner Address from Test: " + owner);
+        if(showLog) console.log("New Owner Address from Test: " + newOwner);
+        return Splitter.deployed()
+        .then(_istance => {
+            istance = _istance;
+            return istance.changeOwner({from : newOwner}); 
+        })
+        .then(success => {
+            assert(success, "Function not called");
+            let ownerAddress = istance.getOwner.call();
+            return ownerAddress;
+        })
+        .then(_ownerAddress => {
+            ownerAddress = _ownerAddress;
+            if(showLog) console.log("Owner Address from Contract: " + ownerAddress);
+            assert.equal(ownerAddress, newOwner, "Owner Dismatch");
+            owner = newOwner;
+            return;
+        })
+    });
+
     it("Add Owner Fund", function() {
 
         let istance;
-        let weiAmount = 1000000000000000;//1 ETH
+        let weiAmount = 1000000000000001;//1 ETH
 
         return Splitter.deployed()
         .then(_istance => {
@@ -112,6 +162,7 @@ contract("Splitter", accounts => {
         .then(_actualOwnerBalance => {
             actualOwnerBalance = _actualOwnerBalance;
             assert(actualOwnerBalance.toNumber() >= 1000000000000, "Not enough Wei on owner's balance") //0.001 ETH
+            if(showLog) console.log("----------------------------------------");
             if(showLog) console.log("Owner Address: " + owner);
             if(showLog) console.log("Owner Balance Before Split: " + actualOwnerBalance);
             return istance.split(beneficiary1, beneficiary2, {from : owner});
@@ -142,7 +193,7 @@ contract("Splitter", accounts => {
         .then(_owner_balance => {
             owner_balance = _owner_balance.toNumber();
             assert.equal(owner_balance, 0, "Owner Balance must be 0 after having split his value");
-            if(showLog) console.log("Owner Address: " + owner);
+            if(showLog) console.log("Owner Address: " + owner_balance);
             if(showLog) console.log("Owner Balance After Split: " + owner_balance);
             return;
         })

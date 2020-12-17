@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+    <head>
+        <title>My Splittle contract</title>
+        <script src="js/web3.js"></script>
+        <script src="js/index.js"></script>
+    </head>
+    <body>
+        <form>
+            Amount: <input name="amount" type="number" id="amount" placeholder="1000000000000000000" /> <br>
+            Beneficiary 1: <input name="beneficiary1" type="text" id="beneficiary1" placeholder="0x1234567890123456789012345678901234567890" /><br>
+            Beneficiary 2: <input name="beneficiary2" type="text" id="beneficiary2" placeholder="0x1234567890123456789012345678901234567890" /><br>
+            <br>
+            <div>
+                <button onclick="connect()">Connect</button><br>
+                <button onclick="alertCoinbase()">Show Coinbase</button><br>
+                <button onclick="changeOwner()">1: Change Owner</button><br>
+                <button onclick="addFund()">2: Add Fund</button><br>
+                <button onclick="split(beneficiary1, beneficiary2)">3: Split</button><br>
+                <button onclick="withdrawRefund(beneficiary1)">4: Withdraw<z/button><br>
+            </div>
+        </form>
+        <br>
+    </body>
+</html>
