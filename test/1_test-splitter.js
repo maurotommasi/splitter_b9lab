@@ -65,7 +65,7 @@ contract("Splitter", accounts => {
             return istance.getBalance.call(owner, {from :  owner});
         })
         .then(actualOwnerBalance => {
-            assert.equal(actualOwnerBalance.toNumber(), expectedOwnerBalance, "Owner balance should be $(expectedOwnerBalance) wei");
+            assert.equal(actualOwnerBalance.toNumber(), expectedOwnerBalance, "Owner balance should be ${expectedOwnerBalance} wei");
             return;
         })
     });
