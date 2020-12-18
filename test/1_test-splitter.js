@@ -8,9 +8,10 @@ contract("Splitter", accounts => {
     let owner, beneficiary1, beneficiary2;
     let balance_owner, balance_b1, balance_b2;
     let showLog = true;
+    let amount = 123456789;
 
     before("Should Set Owner", () => {
-        assert.isAtLeast(accounts.length, 4, 'There should be at least 4 accounts to do this test');
+        assert.isAtLeast(accounts.length, 3, 'There should be at least 3 accounts to do this test');
         owner = accounts[0];
         beneficiary1 = accounts[1];
         beneficiary2 = accounts[2];
@@ -18,6 +19,7 @@ contract("Splitter", accounts => {
         if(showLog) console.log("Owner Address: " + owner);
         if(showLog) console.log("Beneficiary1 Address: " + beneficiary1);
         if(showLog) console.log("Beneficiary2 Address: " + beneficiary2);
+        if(showLog) console.log("Amount to be splitted: " + amount);
     });
 
 
@@ -65,7 +67,7 @@ contract("Splitter", accounts => {
             return istance.getBalance.call(owner, {from :  owner});
         })
         .then(actualOwnerBalance => {
-            assert.equal(actualOwnerBalance.toNumber(), expectedOwnerBalance, "Owner balance should be ${expectedOwnerBalance} wei");
+            assert.equal(actualOwnerBalance.toString(10), expectedOwnerBalance, "Owner balance should be ${expectedOwnerBalance} wei");
             return;
         })
     });
@@ -81,7 +83,7 @@ contract("Splitter", accounts => {
             return istance.getBalance.call(beneficiary1, {from :  beneficiary1});
         })
         .then(actualBeneficiary1Balance => {
-            assert.equal(actualBeneficiary1Balance.toNumber(), 0, "Beneficiary n.1 balance should be 0 wei");
+            assert.equal(actualBeneficiary1Balance.toString(10), 0, "Beneficiary n.1 balance should be 0 wei");
             return;
         })
     });
@@ -97,55 +99,10 @@ contract("Splitter", accounts => {
             return istance.getBalance.call(beneficiary2, {from :  beneficiary2});
         })
         .then(actualBeneficiary2Balance => {
-            assert.equal(actualBeneficiary2Balance.toNumber(), 0, "Beneficiary n.2 balance should be 0 wei");
+            assert.equal(actualBeneficiary2Balance.toString(10), 0, "Beneficiary n.2 balance should be 0 wei");
             return;
         })
     });
-
-    it("Change Owner", function() {
-
-        let istance;
-        let newOwner = accounts[3];
-        if(showLog) console.log("----------------------------------------");
-        if(showLog) console.log("Old Owner Address from Test: " + owner);
-        if(showLog) console.log("New Owner Address from Test: " + newOwner);
-        return Splitter.deployed()
-        .then(_istance => {
-            istance = _istance;
-            return istance.changeOwner({from : newOwner}); 
-        })
-        .then(success => {
-            assert(success, "Function not called");
-            let ownerAddress = istance.getOwner.call();
-            return ownerAddress;
-        })
-        .then(_ownerAddress => {
-            ownerAddress = _ownerAddress;
-            if(showLog) console.log("Owner Address from Contract: " + ownerAddress);
-            assert.equal(ownerAddress, newOwner, "Owner Dismatch");
-            owner = newOwner;
-            return;
-        })
-    });
-
-    it("Add Owner Fund", function() {
-
-        let istance;
-        let weiAmount = 1000000000000001;//1 ETH
-
-        return Splitter.deployed()
-        .then(_istance => {
-            istance = _istance;
-            return istance.addFund({from : owner, value : weiAmount }); 
-        })
-        .then(success => {
-            assert(success, "No funds are sent on owner Balance");
-            let ownerBalance = istance.getBalance.call(owner, {from :  owner});
-            return;
-        })
-
-    });
-
 
 
     it("Should Split Owner Balance", function() {
@@ -157,46 +114,71 @@ contract("Splitter", accounts => {
         return Splitter.deployed()
         .then(_istance => {
             istance = _istance;
-            return istance.getBalance(owner, {from :  owner});
-        })
-        .then(_actualOwnerBalance => {
-            actualOwnerBalance = _actualOwnerBalance;
-            assert(actualOwnerBalance.toNumber() >= 1000000000000, "Not enough Wei on owner's balance") //0.001 ETH
             if(showLog) console.log("----------------------------------------");
-            if(showLog) console.log("Owner Address: " + owner);
-            if(showLog) console.log("Owner Balance Before Split: " + actualOwnerBalance);
-            return istance.split(beneficiary1, beneficiary2, {from : owner});
+            return istance.split(beneficiary1, beneficiary2, {from : owner, value : amount});
         })
         .then(isSplitted => {
             assert(isSplitted, "Split Failed");
-            const SPLIT_LOG_EVENT_NAME = 'splitLog';
+            const SPLIT_LOG_EVENT_NAME = 'SplitLog';
             const isSplitLog = isSplitted.logs[0];
-            //if(showLog) console.log(isSplitLog);
+            if(showLog) console.log(isSplitLog);
             assert.strictEqual(isSplitLog.event, SPLIT_LOG_EVENT_NAME, "${LOG_SPLIT_LOG_EVENT_NAME} was not trown");
             return istance.getBalance.call(beneficiary1, {from :  beneficiary1});
         })
         .then(_beneficiary1_balance => {
-            beneficiary1_balance = _beneficiary1_balance.toNumber();
+            beneficiary1_balance = _beneficiary1_balance;
             assert(beneficiary1_balance > 0, "No new value inside baneficiary1's balance");
             if(showLog) console.log("Beneficiary 1 Address: " + beneficiary1);
             if(showLog) console.log("Beneficiary 1 Balance After Split: " + beneficiary1_balance);
             return istance.getBalance.call(beneficiary2, {from :  beneficiary2});
         })
         .then(_beneficiary2_balance => {
-            beneficiary2_balance = _beneficiary2_balance.toNumber();
+            beneficiary2_balance = _beneficiary2_balance;
             assert(beneficiary2_balance > 0, "No new value inside baneficiary2's balance");
             if(showLog) console.log("Beneficiary 2 Address: " + beneficiary2);
             if(showLog) console.log("Beneficiary 2 Balance After Split: " + beneficiary2_balance);
-            assert(beneficiary1_balance - beneficiary2_balance == 0 || beneficiary1_balance - beneficiary2_balance == 1, "Odd values are not splitted well");
+            assert(beneficiary1_balance - beneficiary2_balance == 0 || beneficiary1_balance - beneficiary2_balance == -1, "Odd values are not splitted well");
             return istance.getBalance.call(owner, {from :  owner});
         })
-        .then(_owner_balance => {
-            owner_balance = _owner_balance.toNumber();
-            assert.equal(owner_balance, 0, "Owner Balance must be 0 after having split his value");
-            if(showLog) console.log("Owner Address: " + owner_balance);
-            if(showLog) console.log("Owner Balance After Split: " + owner_balance);
+    });
+
+   
+    it("Check Beneficiaries Withdraw after split", function() {
+
+        const expectedOwnerBalance = 0;
+        let istance;
+        let contract_beneficiary1_balance, contract_beneficiary2_balance;
+        balance_b1 = web3.eth.getBalance(beneficiary1).then(_balance => {console.log("web3_beneficiary1_balance: " + _balance);})
+        balance_b2 = web3.eth.getBalance(beneficiary2).then(_balance => {console.log("web3_beneficiary2_balance: " + _balance);})
+     
+        
+        if(showLog) console.log("----------------------------------------");
+
+        return Splitter.deployed()
+        .then(_istance => {
+            istance = _istance;
+            return istance.getBalance(beneficiary1);
+        })
+        .then(_balance => {
+            contract_beneficiary1_balance = _balance;
+            if(showLog) console.log("contract_beneficiary1_balance: " + contract_beneficiary1_balance);
+            return istance.getBalance(beneficiary2);
+        })
+        .then(_balance => {
+            contract_beneficiary2_balance = _balance;
+            if(showLog) console.log("contract_beneficiary2_balance: " + contract_beneficiary2_balance);
+            return istance.withdrawRefund({from : beneficiary1});
+        })
+        .then(_success => {
+            assert(_success, "withdrawRefund of beneficiary 1 failed");
+            return istance.withdrawRefund({from : beneficiary2});
+        })
+        .then(_success => {
+            //assert((web3.eth.getBalance(beneficiary1) > web3_beneficiary1_balance) && (web3.eth.getBalance(beneficiary2) > web3_beneficiary2_balance), "withdrawRefunds failed");
             return;
         })
+
+
     });
 
 });
