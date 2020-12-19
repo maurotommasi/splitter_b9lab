@@ -137,7 +137,7 @@ contract("Splitter", accounts => {
             assert(beneficiary2_balance > 0, "No new value inside baneficiary2's balance");
             if(showLog) console.log("Beneficiary 2 Address: " + beneficiary2);
             if(showLog) console.log("Beneficiary 2 Balance After Split: " + beneficiary2_balance);
-            assert(beneficiary1_balance - beneficiary2_balance == 0 || beneficiary1_balance - beneficiary2_balance == -1, "Odd values are not splitted well");
+            assert(beneficiary1_balance - beneficiary2_balance == 0, "Amount is not well splitted");
             return istance.getBalance.call(owner, {from :  owner});
         })
     });
@@ -148,11 +148,23 @@ contract("Splitter", accounts => {
         const expectedOwnerBalance = 0;
         let istance;
         let contract_beneficiary1_balance, contract_beneficiary2_balance;
-        balance_b1 = web3.eth.getBalance(beneficiary1).then(_balance => {console.log("web3_beneficiary1_balance: " + _balance);})
-        balance_b2 = web3.eth.getBalance(beneficiary2).then(_balance => {console.log("web3_beneficiary2_balance: " + _balance);})
-     
-        
+        let balance_b1, balance_b2;
+
         if(showLog) console.log("----------------------------------------");
+
+        //I can show the log but I can't catch the value and put it on balance_b1 / balance_b2
+        if(showLog){
+            balance_b1 = web3.eth.getBalance(beneficiary1).then(_balance => {
+                balance = _balance;
+                console.log("web3_beneficiary1_balance BEFORE " + balance);
+                return balance;
+            })
+            balance_b2 = web3.eth.getBalance(beneficiary2).then(_balance => {
+                balance = _balance;
+                console.log("web3_beneficiary2_balance BEFORE: " + balance);
+                return balance;
+            })
+        }
 
         return Splitter.deployed()
         .then(_istance => {
@@ -174,12 +186,24 @@ contract("Splitter", accounts => {
             return istance.withdrawRefund({from : beneficiary2});
         })
         .then(_success => {
-            //assert((web3.eth.getBalance(beneficiary1) > web3_beneficiary1_balance) && (web3.eth.getBalance(beneficiary2) > web3_beneficiary2_balance), "withdrawRefunds failed");
+            if(showLog){
+                web3.eth.getBalance(beneficiary1).then(_balance => {
+                    balance = _balance;
+                    console.log("web3_beneficiary1_balance AFTER: " + balance);
+                    return balance;
+                })
+                .then(_result => {return _result});
+                web3.eth.getBalance(beneficiary2).then(_balance => {
+                    balance = _balance;
+                    console.log("web3_beneficiary2_balance AFTER: " + balance);
+                    return;
+                })  
+            }
             return;
         })
-
-
     });
 
+        
+   
 });
   

@@ -27,14 +27,13 @@ contract Splitter {
 
         uint actualFirstBalance = balances[_first];
         uint actualSecondBalance = balances[_second];
-        uint half1 = msg.value / 2;
-        uint half2 = msg.value - half1;
+        uint half = msg.value / 2; //if odd 1 wei stay on balance[msg.sender];
         
-        require(actualFirstBalance + half1 > actualFirstBalance);
-        require(actualSecondBalance + half2 > actualSecondBalance);
+        require(actualFirstBalance + half > actualFirstBalance);
+        require(actualSecondBalance + half > actualSecondBalance);
 
-        balances[_first] += half1;
-        balances[_second] += half2;
+        balances[_first] += half;
+        balances[_second] += half;
 
         emit SplitLog(msg.sender, msg.value);
 
