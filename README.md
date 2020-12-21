@@ -1,5 +1,9 @@
 # splitter_b9lab
 
-Truffle_console.sh is a file where I test manually how the project works.
+Update (2020/12/21 7PM UTC + 1):
 
-Now (2020 12 19 at 18.27 UTC +1) I have to develop the Js part for Web UI.
+- Insert safeMath
+- Fixed odd values
+- Minimized gas on split function
+- Changed parameter name on SplitLog
+- Changed some settings on tests
