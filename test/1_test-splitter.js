@@ -8,7 +8,7 @@ contract("Splitter", accounts => {
     let owner, beneficiary1, beneficiary2;
     let balance_owner, balance_b1, balance_b2;
     let showLog = true;
-    let amount = 123456789;
+    let amount = 1234567890;
 
     before("Should Set Owner", () => {
         assert.isAtLeast(accounts.length, 3, 'There should be at least 3 accounts to do this test');

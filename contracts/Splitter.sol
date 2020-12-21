@@ -6,15 +6,10 @@ contract Splitter {
 
     address owner;
 
-    event SplitLog(address indexed owner, uint amount);
+    event SplitLog(address indexed owner, uint amount, address first, address second);
     event WithdrawRefundlog(address beneficiary, uint amount);
 
     mapping(address => uint) balances;
-
-    modifier onlyOwner {
-        require(owner == msg.sender);
-        _;
-    }
 
     constructor() public {
         owner = msg.sender;
@@ -22,12 +17,13 @@ contract Splitter {
     
     function split(address _first, address _second) payable public returns(bool){
 
+        require(msg.value % 2 == 0, "Can't split odd values");
         require(_first != msg.sender && _second != msg.sender && _first != _second, "There are two or more identical addresses");
         require(_first != address(0x0) && _second != address(0x0), "Beneficiaries could not be null");
 
         uint actualFirstBalance = balances[_first];
         uint actualSecondBalance = balances[_second];
-        uint half = msg.value / 2; //if odd 1 wei stay on balance[msg.sender];
+        uint half = msg.value / 2; 
         
         require(actualFirstBalance + half > actualFirstBalance);
         require(actualSecondBalance + half > actualSecondBalance);
@@ -35,7 +31,7 @@ contract Splitter {
         balances[_first] += half;
         balances[_second] += half;
 
-        emit SplitLog(msg.sender, msg.value);
+        emit SplitLog(msg.sender, msg.value, _first, _second);
 
         return true;
     }
