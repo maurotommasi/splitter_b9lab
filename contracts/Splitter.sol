@@ -1,43 +1,43 @@
 // SPDX-License-Identifier: MIT
 
+import "./SafeMath.sol";
+
 pragma solidity 0.6.10;
 
 contract Splitter {
 
-    address owner;
+    using SafeMath for uint;
 
-    event SplitLog(address indexed who, uint amount, address first, address second);
+    address public owner;
+
+    event SplitLog(address indexed owner, uint amount, address first, address second);
     event WithdrawRefundlog(address beneficiary, uint amount);
 
-    mapping(address => uint) balances;
+    mapping(address => uint) public balances;
 
     constructor() public {
         owner = msg.sender;
     }   
     
-    function split(address _first, address _second) payable public returns(bool){
+   function split(address _first, address _second) payable public returns(bool){
 
-        require(msg.value % 2 == 0, "Can't split odd values");
         require(_first != msg.sender && _second != msg.sender && _first != _second, "There are two or more identical addresses");
         require(_first != address(0x0) && _second != address(0x0), "Beneficiaries could not be null");
 
-        uint actualFirstBalance = balances[_first];
-        uint actualSecondBalance = balances[_second];
-        uint half = msg.value / 2; 
-        
-        require(actualFirstBalance + half > actualFirstBalance);
-        require(actualSecondBalance + half > actualSecondBalance);
+        if(msg.value % 2 == 1) {
+            balances[msg.sender] += 1;
+        }
 
-        balances[_first] += half;
-        balances[_second] += half;
+        balances[_first] = balances[_first].add(msg.value / 2);
+        balances[_second] = balances[_second].add(msg.value / 2);
 
         emit SplitLog(msg.sender, msg.value, _first, _second);
 
         return true;
     }
 
-    function getBalance(address _address) public view returns(uint){
-        return balances[_address];
+    function getBalance() public view returns(uint){
+        return balances[msg.sender];
     }
 
     function withdrawRefund() public returns(bool){
