@@ -10,7 +10,7 @@ contract Splitter {
 
     address public owner;
 
-    event SplitLog(address indexed owner, uint amount, address first, address second);
+    event SplitLog(address indexed sender, uint amount, address first, address second);
     event WithdrawRefundlog(address beneficiary, uint amount);
 
     mapping(address => uint) public balances;
