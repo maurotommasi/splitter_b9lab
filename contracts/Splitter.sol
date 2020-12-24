@@ -19,10 +19,10 @@ contract Splitter {
         require(_first != address(0x0) && _second != address(0x0), "Beneficiaries could not be null");
         require(msg.value != uint(0), "Value can't be 0");
 
-        uint unsplittableValue = msg.value.mod(2); // See Analysis.sol to know why it should less expansive to use % 2
+        uint unsplittableValue = msg.value.mod(uint(2)); // See Analysis.sol to know why it should less expansive to use % 2
 
-        balances[_first] = balances[_first].add(msg.value.div(2)); //See Analysis.sol to know why it should less expansive to use / 2
-        balances[_second] = balances[_second].add(msg.value.div(2)); //See Analysis.sol to know why it should less expansive to use / 2
+        balances[_first] = balances[_first].add(msg.value.div(uint(2))); //See Analysis.sol to know why it should less expansive to use / 2
+        balances[_second] = balances[_second].add(msg.value.div(uint(2))); //See Analysis.sol to know why it should less expansive to use / 2
 
         emit SplitLog(msg.sender, msg.value, _first, _second, unsplittableValue);
 
