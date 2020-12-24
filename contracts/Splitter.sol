@@ -24,6 +24,8 @@ contract Splitter {
         balances[_first] = balances[_first].add(msg.value.div(uint(2))); //See Analysis.sol to know why it should less expansive to use / 2
         balances[_second] = balances[_second].add(msg.value.div(uint(2))); //See Analysis.sol to know why it should less expansive to use / 2
 
+        if(unsplittableValue != 0) balances[msg.sender].add(unsplittableValue);
+
         emit SplitLog(msg.sender, msg.value, _first, _second, unsplittableValue);
 
         return true;
