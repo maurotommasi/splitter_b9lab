@@ -8,22 +8,24 @@ contract Splitter {
 
     using SafeMath for uint;
 
-    event SplitLog(address indexed sender, uint amount, address[] addresses);
+    event SplitLog(address indexed sender, uint amount, address[] addresses, uint unsplittableValue);
     event WithdrawRefundlog(address beneficiary, uint amount);
 
     mapping(address => uint) public balances;
     
-   function split(address[] _addresses) payable public returns(bool){
+   function splitMult(address[] memory _addresses) payable public returns(bool){
 
        // NOT TESTED!!!
        
         require(_addresses.length >= 2);
         require(msg.value > _addresses.length);
         uint count;
-        for(uint i = 0; i < _addresses.length ; i++){
+        uint i;
+        uint j;
+        for(i = 0; i < _addresses.length ; i++){
             count = 0;
             require(_addresses[i] != msg.sender || _addresses[i] != address(0x0), "Sender can't be a beneficiary or a null address");
-            for(uint j = 0; j < _addresses.length ; j++){
+            for(j = 0; j < _addresses.length ; j++){
                 if(_addresses[i] == _addresses[j]) count++;
             }
             require(count == 0, "No Duplicate Address are allowed");
@@ -37,10 +39,7 @@ contract Splitter {
 
         if(unsplittableValue > 0) balances[msg.sender].add(unsplittableValue);
 
-        balances[_first] = balances[_first].add(msg.value / 2);
-        balances[_second] = balances[_second].add(msg.value / 2);
-
-        emit SplitLog(msg.sender, msg.value, addresses);
+        emit SplitLog(msg.sender, msg.value, _addresses, unsplittableValue);
 
         return true;
     }
@@ -59,15 +58,11 @@ contract Splitter {
 
         emit WithdrawRefundlog(msg.sender, amountToRefund);
 
-        balances[msg.sender] = 0;
+        balances[msg.sender] = uint(0);
 
         msg.sender.transfer(amountToRefund);
         
         return true;
-    }
-
-    function () {
-        revert();
     }
 
 }

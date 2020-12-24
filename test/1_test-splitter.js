@@ -25,23 +25,6 @@ contract("Splitter", accounts => {
     });
 
 
-    it("sender is the first account", function() {
-        
-        return Splitter.deployed()
-        .then(_istance => {
-            splitter = _istance;
-            return splitter.getOwner.call();
-        })
-        .then(_actualOwner => {
-            actualOwner = _actualOwner;
-            if(showLog) console.log("----------------------------------------");
-            if(showLog) console.log("actualOwner: " + actualOwner);
-            assert.equal(sender, _actualOwner, "Owner Dismatch");
-            return;
-        });
-    });
-
-
     it("Should deploy my contract without additional values", function() {
         return expectedExceptionPromise(function () {
                 return Splitter.new({ from: sender, value: 1, gas: 3000000 })

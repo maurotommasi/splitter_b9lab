@@ -8,22 +8,23 @@ contract Splitter {
 
     using SafeMath for uint;
 
-    event SplitLog(address indexed sender, uint amount, address first, address second);
+    event SplitLog(address indexed sender, uint amount, address first, address second, uint unsplittableValue);
     event WithdrawRefundlog(address beneficiary, uint amount);
 
     mapping(address => uint) public balances;
     
-   function split(address[] _addresses) payable public returns(bool){
+   function split(address _first, address _second) payable external returns(bool){
 
         require(_first != msg.sender && _second != msg.sender && _first != _second, "There are two or more identical addresses");
         require(_first != address(0x0) && _second != address(0x0), "Beneficiaries could not be null");
+        require(msg.value != uint(0), "Value can't be 0");
 
-        uint unsplittableValue = msg.value % 2; // See Analysis.sol to know why I don't use .mod
+        uint unsplittableValue = msg.value.mod(2); // See Analysis.sol to know why it should less expansive to use % 2
 
-        balances[_first] = balances[_first].add(msg.value / 2); //See Analysis.sol to know why I don't use .mod
-        balances[_second] = balances[_second].add(msg.value / 2);
+        balances[_first] = balances[_first].add(msg.value.div(2)); //See Analysis.sol to know why it should less expansive to use / 2
+        balances[_second] = balances[_second].add(msg.value.div(2)); //See Analysis.sol to know why it should less expansive to use / 2
 
-        emit SplitLog(msg.sender, msg.value, _first, _second);
+        emit SplitLog(msg.sender, msg.value, _first, _second, unsplittableValue);
 
         return true;
     }
@@ -38,19 +39,15 @@ contract Splitter {
 
         uint amountToRefund = balances[msg.sender];
 
-        require(amountToRefund > 0, "No wei are available in this balance"); 
-
-        balances[msg.sender] = 0;
-
-        msg.sender.transfer(amountToRefund);
+        require(amountToRefund != uint(0), "Balance can't be equal to 0");
 
         emit WithdrawRefundlog(msg.sender, amountToRefund);
+
+        balances[msg.sender] = uint(0);
+
+        msg.sender.transfer(amountToRefund);
         
         return true;
-    }
-
-    function () {
-        revert();
     }
 
 }
