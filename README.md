@@ -1,6 +1,6 @@
 # splitter_b9lab
 
-Update (2020/12/21 7PM UTC + 1):
+Update (2020/12/24 4PM UTC + 1):
 
 - Added untested Spliiter Mult
 - Added Analysis.sol
