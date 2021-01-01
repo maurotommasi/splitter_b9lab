@@ -6,7 +6,6 @@ contract("Splitter", accounts => {
     console.log(accounts);
     
     let sender, beneficiary1, beneficiary2;
-    let balance_sender, balance_b1, balance_b2;
     let showLog = true;
     let amount = 1234567890;
     let splitter;
@@ -83,7 +82,6 @@ contract("Splitter", accounts => {
 
     it("Should Split sender Balance", function() {
 
-        const expectedsenderBalance = 0;
         let beneficiary1_balance, beneficiary2_balance;
 
         return Splitter.deployed()
@@ -120,7 +118,6 @@ contract("Splitter", accounts => {
    
     it("Check Beneficiaries Withdraw after split", function() {
 
-        const expectedsenderBalance = 0;
         let contract_beneficiary1_balance, contract_beneficiary2_balance;
         let balance_b1, balance_b2;
 
