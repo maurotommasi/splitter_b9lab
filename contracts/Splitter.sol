@@ -1,48 +1,42 @@
 // SPDX-License-Identifier: MIT
-
 import "./SafeMath.sol";
 import "./Stoppable.sol";
+import "./Safety.sol";
 
 pragma solidity 0.6.10;
 
-contract Splitter is Stoppable{
+contract Splitter is Stoppable, Safety {
 
     using SafeMath for uint;
 
     event SplitLog(address indexed sender, uint amount, address first, address second);
-    event WithdrawRefundlog(address beneficiary, uint amount);
+    event WithdrawRefundlog(address who, uint amount);
 
     mapping(address => uint) public balances;
     
-   function split(address _first, address _second) payable onlyIfRunning external returns(bool){
+    function split(address _first, address _second) payable onlyIfRunning external returns(bool){
 
-        require(_first != msg.sender && _second != msg.sender && _first != _second, "There are two or more identical addresses");
-        require(_first != address(0x0) && _second != address(0x0), "Beneficiaries could not be null");
-        require(msg.value != uint(0), "Value can't be 0");
+        require(_first != msg.sender && _second != msg.sender, "Splitter.split#001 : Sender can't be a beneficiary");
+        require(_first != _second, "Splitter.split#002 : Beneficiaries can't have the same value");
+        require(msg.value != uint(0), "Splitter.split#003 : Value can't be 0");
 
         uint unsplittableValue = msg.value.mod(uint(2)); // See Analysis.sol to know why it should less expansive to use % 2
 
         balances[_first] = balances[_first].add(msg.value.div(uint(2))); //See Analysis.sol to know why it should less expansive to use / 2
         balances[_second] = balances[_second].add(msg.value.div(uint(2))); //See Analysis.sol to know why it should less expansive to use / 2
 
-        if(unsplittableValue != 0) balances[msg.sender] += 1;
+        if(unsplittableValue != 0) balances[msg.sender].add(unsplittableValue);
 
         emit SplitLog(msg.sender, msg.value, _first, _second);
 
         return true;
     }
 
-    function getBalance() public view returns(uint){
-        return balances[msg.sender];
-    }
-
-    function withdrawRefund() external onlyIfRunning returns(bool){ //Even if I think it's better to leave this without onlyIfRunning (I can have more trust on who use this contract)
-
-        require(msg.sender != address(0x0));
+    function withdrawRefund() external ReentranceCallDetection returns(bool){ 
 
         uint amountToRefund = balances[msg.sender];
 
-        require(amountToRefund != uint(0), "Balance can't be equal to 0");
+        require(amountToRefund != uint(0), "Splitter.withdrawRefund#001 : Balance can't be equal to 0");
 
         emit WithdrawRefundlog(msg.sender, amountToRefund);
 

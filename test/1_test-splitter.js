@@ -1,180 +1,109 @@
 const Splitter = artifacts.require("./Splitter.sol");
-const expectedExceptionPromise = require("./util/expected_exception_testRPC_and_geth.js");
 
 contract("Splitter", accounts => {
 
     console.log(accounts);
     
+    const SHOWLOG = true;
+    const AMOUNT = web3.utils.toBN(web3.utils.toWei('1', 'ether'));
     let sender, beneficiary1, beneficiary2;
-    let showLog = true;
-    let amount = 1234567890;
+
     let splitter;
 
     before("Should Set Accounts", async () => {
-        assert.isAtLeast(accounts.length, 3, 'There should be at least 3 accounts to do this test');
+        assert.isAtLeast(accounts.length, 5, 'There should be at least 3 accounts to do this test');
+        [owner, sender, beneficiary1, beneficiary2, newOwner, stranger] = accounts
+        if(SHOWLOG) console.log("----------------------------------------");
+        if(SHOWLOG) console.log("sender Address: " + sender);
+        if(SHOWLOG) console.log("Beneficiary1 Address: " + beneficiary1);
+        if(SHOWLOG) console.log("Beneficiary2 Address: " + beneficiary2);
+        if(SHOWLOG) console.log("Amount to be splitted: " + AMOUNT);
+    });
+
+    beforeEach("New Istance of Splitter Test", async () => {
         splitter = await Splitter.new();
-        sender = accounts[0];
-        beneficiary1 = accounts[1];
-        beneficiary2 = accounts[2];
-        if(showLog) console.log("----------------------------------------");
-        if(showLog) console.log("sender Address: " + sender);
-        if(showLog) console.log("Beneficiary1 Address: " + beneficiary1);
-        if(showLog) console.log("Beneficiary2 Address: " + beneficiary2);
-        if(showLog) console.log("Amount to be splitted: " + amount);
     });
 
-
-    it("Should deploy my contract without additional values", function() {
-        return expectedExceptionPromise(function () {
-                return Splitter.new({ from: sender, value: 1, gas: 3000000 })
-            }, 3000000);
-    });
-
-    //IT WILL FAIL! Uncomment to verify this
-    
-    //it("Should deploy my contract with additional values", function() {
-    //   return expectedExceptionPromise(function () {
-    //            return Splitter.new("ExampleParam", { from: accounts[0], value: 1, gas: 3000000 })
-    //        }, 3000000);
-    //});
-
-    it("Should Set sender Balance", function() {
-
-        const expectedsenderBalance = 0;
-
-        return Splitter.deployed()
-        .then(_istance => {
-            splitter = _istance;
-            return splitter.getBalance.call({from :  beneficiary1});
-        })
-        .then(actualsenderBalance => {
-            assert.equal(actualsenderBalance.toString(10), expectedsenderBalance, "sender balance should be ${expectedsenderBalance} wei");
-            return;
-        })
-    });
-
-    it("Should Set Beneficiary n.1", function() {
-
-        return Splitter.deployed()
-        .then(_istance => {
-            splitter = _istance;
-            return splitter.getBalance.call({from :  beneficiary1});
-        })
-        .then(actualBeneficiary1Balance => {
-            assert.equal(actualBeneficiary1Balance.toString(10), 0, "Beneficiary n.1 balance should be 0 wei");
-            return;
-        })
-    });
-
-    it("Should Set Beneficiary n.2", function() {
-
-        return Splitter.deployed()
-        .then(_istance => {
-            splitter = _istance;
-            return splitter.getBalance.call({from :  beneficiary2});
-        })
-        .then(actualBeneficiary2Balance => {
-            assert.equal(actualBeneficiary2Balance.toString(10), 0, "Beneficiary n.2 balance should be 0 wei");
-            return;
-        })
-    });
-
-
-    it("Should Split sender Balance", function() {
-
-        let beneficiary1_balance, beneficiary2_balance;
-
-        return Splitter.deployed()
-        .then(_istance => {
-            splitter = _istance;
-            if(showLog) console.log("----------------------------------------");
-            return splitter.split(beneficiary1, beneficiary2, {from : sender, value : amount});
-        })
-        .then(isSplitted => {
-            assert(isSplitted, "Split Failed");
-            const SPLIT_LOG_EVENT_NAME = 'SplitLog';
-            const isSplitLog = isSplitted.logs[0];
-            if(showLog) console.log(isSplitLog);
-            assert.strictEqual(isSplitLog.event, SPLIT_LOG_EVENT_NAME, "${LOG_SPLIT_LOG_EVENT_NAME} was not trown");
-            return splitter.getBalance.call({from :  beneficiary1});
-        })
-        .then(_beneficiary1_balance => {
-            beneficiary1_balance = _beneficiary1_balance;
-            assert(beneficiary1_balance > 0, "No new value inside baneficiary1's balance");
-            if(showLog) console.log("Beneficiary 1 Address: " + beneficiary1);
-            if(showLog) console.log("Beneficiary 1 Balance After Split: " + beneficiary1_balance);
-            return splitter.getBalance.call({from :  beneficiary2});
-        })
-        .then(_beneficiary2_balance => {
-            beneficiary2_balance = _beneficiary2_balance;
-            assert(beneficiary2_balance > 0, "No new value inside baneficiary2's balance");
-            if(showLog) console.log("Beneficiary 2 Address: " + beneficiary2);
-            if(showLog) console.log("Beneficiary 2 Balance After Split: " + beneficiary2_balance);
-            assert(beneficiary1_balance - beneficiary2_balance == 0, "Amount is not well splitted");
-            return splitter.getBalance.call({from :  sender});
-        })
-    });
-
-   
-    it("Check Beneficiaries Withdraw after split", function() {
-
-        let contract_beneficiary1_balance, contract_beneficiary2_balance;
-        let balance_b1, balance_b2;
-
-        if(showLog) console.log("----------------------------------------");
-
-        //I can show the log but I can't catch the value and put it on balance_b1 / balance_b2
-        if(showLog){
-            balance_b1 = web3.eth.getBalance(beneficiary1).then(_balance => {
-                balance = _balance;
-                console.log("web3_beneficiary1_balance BEFORE " + balance);
-                return balance;
-            })
-            balance_b2 = web3.eth.getBalance(beneficiary2).then(_balance => {
-                balance = _balance;
-                console.log("web3_beneficiary2_balance BEFORE: " + balance);
-                return balance;
-            })
+    function matchError(solidityExpectedError, e, showData = false){
+        const r = " -- Reason given: ";
+        const javascriptError = e.toString().substring(e.toString().indexOf(r) + r.length, e.toString().length - 1);
+        assert.strictEqual(solidityExpectedError, javascriptError, "Predicted errors dismatch!");
+        if(showData){
+            console.log("Solidity Error: " + solidityExpectedError);
+            console.log("Truffle Javascript Error: " + javascriptError);
         }
+        return true;
+    }
 
-        return Splitter.deployed()
-        .then(_istance => {
-            splitter = _istance;
-            return splitter.getBalance({from : beneficiary1});
-        })
-        .then(_balance => {
-            contract_beneficiary1_balance = _balance;
-            if(showLog) console.log("contract_beneficiary1_balance: " + contract_beneficiary1_balance);
-            return splitter.getBalance({from : beneficiary2});
-        })
-        .then(_balance => {
-            contract_beneficiary2_balance = _balance;
-            if(showLog) console.log("contract_beneficiary2_balance: " + contract_beneficiary2_balance);
-            return splitter.withdrawRefund({from : beneficiary1});
-        })
-        .then(_success => {
-            assert(_success, "withdrawRefund of beneficiary 1 failed");
-            return splitter.withdrawRefund({from : beneficiary2});
-        })
-        .then(_success => {
-            if(showLog){
-                web3.eth.getBalance(beneficiary1).then(_balance => {
-                    balance = _balance;
-                    console.log("web3_beneficiary1_balance AFTER: " + balance);
-                    return balance;
-                })
-                .then(_result => {return _result});
-                web3.eth.getBalance(beneficiary2).then(_balance => {
-                    balance = _balance;
-                    console.log("web3_beneficiary2_balance AFTER: " + balance);
-                    return;
-                })  
+    describe("#SingleUnitTest", function() {
+
+        it("#001 - Sender can't be a beneficiaries", async function() {
+            try {
+                assert(await splitter.split(sender, beneficiary1, {from : sender, value : AMOUNT}));
+            } catch(e) {
+                assert(matchError("Splitter.split#001 : Sender can't be a beneficiary", e));
             }
-            return;
-        })
-    });
+        });
+        
+        it("#002 - Beneficiaries can't have the same address", async function() {
+            try {
+                assert(await splitter.split(beneficiary1, beneficiary1, {from : sender, value : AMOUNT}));
+            } catch(e) {
+                assert(matchError("Splitter.split#002 : Beneficiaries can't have the same value", e));
+            }
+        });
+
+        it("#003 - Value can't be 0", async function() {
+            try {
+                assert(await splitter.split(beneficiary1, beneficiary2, {from : sender, value : 0}));
+            } catch(e) {
+                assert(matchError("Splitter.split#003 : Value can't be 0", e));
+            }
+        });
+
+        it("#004 - Amount to refund can't be 0", async function() {
+
+            const beneficiary1_balance = await splitter.balances.call(beneficiary1);
+
+            assert.strictEqual(beneficiary1_balance.toString(10), web3.utils.toBN(0).toString(10));
+
+            try {
+                assert(await splitter.withdrawRefund({from : beneficiary1}));
+            } catch(e) {
+                assert(matchError("Splitter.withdrawRefund#001 : Balance can't be equal to 0", e));
+            }
+
+        });
+
+        it("#006 - Split", async function() {
+
+            assert(beneficiary1 != beneficiary2);
+            assert(AMOUNT.toString(10) != web3.utils.toBN(0).toString(10));
+            assert(sender != beneficiary1 && sender != beneficiary2);
+
+            const txObj = await splitter.split(beneficiary1, beneficiary2, {from : sender, value : AMOUNT});
+
+            assert.strictEqual(txObj.logs[0].args.sender.toString(10), sender.toString(10), "Sender Dismach");
+            assert.strictEqual(web3.utils.toBN(txObj.logs[0].args.amount).toString(10), AMOUNT.toString(10), "Amount Dismach");
+            assert.strictEqual(txObj.logs[0].args.first.toString(10), beneficiary1.toString(10), "Beneficiary1 Dismach");
+            assert.strictEqual(txObj.logs[0].args.second.toString(10), beneficiary2.toString(10), "Beneficiary2 Dismach");
+
+        });
+
 
         
+        it("#007 - Withdraw Balance", async function() {
+            
+            // Should split some amount before to be able to withdraw something
+            await splitter.split(beneficiary1, beneficiary2, {from : sender, value : AMOUNT});
+
+            const txObj = await splitter.withdrawRefund({from : beneficiary1});
+
+            assert.strictEqual(txObj.logs[0].args.who.toString(10), beneficiary1.toString(10), "Withdrawer Dismach");
+
+        });
+
+    });
    
 });
   

@@ -3,7 +3,7 @@ module.exports=[
   {
     "constant": true,
     "inputs": [
-      {                                                                                                                                                 
+      {
         "name": "_owner",
         "type": "address"
       }
@@ -1880,7 +1880,7 @@ module.exports = function (value, options) {
 
 
 var BigNumber = require('bignumber.js');
-var sha3 = require('./sha3.js.js');
+var sha3 = require('./sha3.js');
 var utf8 = require('utf8');
 
 var unitMap = {
@@ -3359,7 +3359,7 @@ module.exports = SolidityEvent;
 
 },{"../solidity/coder":7,"../utils/sha3":19,"../utils/utils":20,"./filter":29,"./formatters":30,"./methods/watches":43}],28:[function(require,module,exports){
 var formatters = require('./formatters');
-var utils = require('../utils/utils');
+var utils = require('./../utils/utils');
 var Method = require('./method');
 var Property = require('./property');
 
