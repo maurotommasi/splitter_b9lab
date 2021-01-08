@@ -102,7 +102,7 @@ contract("Splitter", accounts => {
 
             const txObj = await splitter.withdrawRefund({from : beneficiary1});
 
-            assert.strictEqual(txObj.logs[0].args.who.toString(10), beneficiary1.toString(10), "Withdrawer Dismach");
+            assert.strictEqual(txObj.logs[0].args.who.toString(10), beneficiary1.toString(10), "Withdrawer Dismatch");
 
             console.log("Beneficiary 1 Web3 Balance After: ", await web3.eth.getBalance(beneficiary1));
 
