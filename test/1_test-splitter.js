@@ -6,13 +6,13 @@ contract("Splitter", accounts => {
     
     const SHOWLOG = true;
     const AMOUNT = web3.utils.toBN(web3.utils.toWei('1', 'ether'));
-    let sender, beneficiary1, beneficiary2;
+    let owner, sender, beneficiary1, beneficiary2;
 
     let splitter;
 
     before("Should Set Accounts", async () => {
         assert.isAtLeast(accounts.length, 5, 'There should be at least 3 accounts to do this test');
-        [owner, sender, beneficiary1, beneficiary2, newOwner, stranger] = accounts
+        [owner, sender, beneficiary1, beneficiary2] = accounts
         if(SHOWLOG) console.log("----------------------------------------");
         if(SHOWLOG) console.log("sender Address: " + sender);
         if(SHOWLOG) console.log("Beneficiary1 Address: " + beneficiary1);
