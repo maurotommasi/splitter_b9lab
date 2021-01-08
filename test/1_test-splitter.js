@@ -95,11 +95,16 @@ contract("Splitter", accounts => {
         it("#007 - Withdraw Balance", async function() {
             
             // Should split some amount before to be able to withdraw something
+            
             await splitter.split(beneficiary1, beneficiary2, {from : sender, value : AMOUNT});
+
+            console.log("Beneficiary 1 Web3 Balance Before: ", await web3.eth.getBalance(beneficiary1));
 
             const txObj = await splitter.withdrawRefund({from : beneficiary1});
 
             assert.strictEqual(txObj.logs[0].args.who.toString(10), beneficiary1.toString(10), "Withdrawer Dismach");
+
+            console.log("Beneficiary 1 Web3 Balance After: ", await web3.eth.getBalance(beneficiary1));
 
         });
 
