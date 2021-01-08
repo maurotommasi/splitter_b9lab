@@ -30,4 +30,4 @@ contract Owned {
         return true;
     }
 
-}
+} 

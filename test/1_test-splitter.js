@@ -59,7 +59,7 @@ contract("Splitter", accounts => {
             } catch(e) {
                 assert(matchError("Splitter.split#003 : Value can't be 0", e));
             }
-        });
+        }); 
 
         it("#004 - Amount to refund can't be 0", async function() {
 

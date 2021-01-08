@@ -3,7 +3,7 @@ import "./SafeMath.sol";
 import "./Stoppable.sol";
 import "./Safety.sol";
 
-pragma solidity 0.6.10;
+pragma solidity 0.6.10; 
 
 contract Splitter is Stoppable, Safety {
 
