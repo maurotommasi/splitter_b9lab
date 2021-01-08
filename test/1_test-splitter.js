@@ -11,7 +11,7 @@ contract("Splitter", accounts => {
     let splitter;
 
     before("Should Set Accounts", async () => {
-        assert.isAtLeast(accounts.length, 5, 'There should be at least 3 accounts to do this test');
+        assert.isAtLeast(accounts.length, 4, 'There should be at least 4 accounts to do this test');
         [owner, sender, beneficiary1, beneficiary2] = accounts
         if(SHOWLOG) console.log("----------------------------------------");
         if(SHOWLOG) console.log("sender Address: " + sender);
